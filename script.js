@@ -1,72 +1,52 @@
-"use strict"; // Активує строгий режим
-console.log("Підключено JavaScript для Практичної роботи №1");
+"use strict";
+console.log("Підключено JavaScript для Практичної роботи №5");
 
-// 1. Робота в DevTools
-console.log("Hello from external file!");
+// 1. Завантаження користувачів з jsonplaceholder API
+const loadUsersButton = document.getElementById("loadUsers");
+const userOutput = document.getElementById("userOutput");
 
-// 2. Strict mode — помилка при неоголошеній змінній
-// x = 10; // ❌ ReferenceError, бо x не оголошена
+loadUsersButton.addEventListener("click", async () => {
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/users");
+    if (!response.ok) throw new Error("HTTP error: " + response.status);
 
-// 3. Змінні та область видимості
-let age = 25;
-const PI = 3.14;
-var name = "John";
+    const data = await response.json();
+    userOutput.textContent = JSON.stringify(data, null, 2);
+    console.log("Користувачі завантажені:", data);
+  } catch (error) {
+    console.error("Помилка завантаження користувачів:", error);
+    userOutput.textContent = `Помилка: ${error.message}`;
+  }
+});
 
-{
-  let blockVar = "Я у блоці";
-  console.log(blockVar); // Працює
-}
-// console.log(blockVar); // ❌ ReferenceError
+// 2. Завантаження даних з PokeAPI
+const loadPokemonButton = document.getElementById("loadPokemon");
+const pokemonOutput = document.getElementById("pokemonOutput");
 
-// Зміна значення змінної
-let counter = 10;
-counter++;
-console.log("Counter:", counter);
+loadPokemonButton.addEventListener("click", async () => {
+  const nameOrId = prompt("Введіть ім'я або ID покемона:");
+  if (!nameOrId) return;
 
-// 4. Типи даних і typeof
-console.log(typeof 42); // number
-console.log(typeof "Hello"); // string
-console.log(typeof true); // boolean
-console.log(typeof null); // object (особливість JS)
-console.log(typeof undefined); // undefined
-console.log(typeof { name: "JS" }); // object
-console.log(typeof Symbol("id")); // symbol
-console.log(typeof 10n); // bigint
+  try {
+    const response = await fetch(
+      `https://pokeapi.co/api/v2/pokemon/${nameOrId.toLowerCase()}`
+    );
+    if (!response.ok)
+      throw new Error("Покемона не знайдено. Спробуйте інше ім’я або ID.");
 
-// 5. Перетворення типів
-console.log(Number("123")); // 123
-console.log(String(123)); // "123"
-console.log(Boolean(0)); // false
-console.log(Boolean(1)); // true
-
-// 6. Взаємодія з користувачем
-alert("Ласкаво просимо до анкети!");
-
-let userName = prompt("Введіть ваше ім'я:");
-let userAge = Number(prompt("Введіть ваш вік:"));
-let userCity = prompt("З якого ви міста?");
-let userColor = prompt("Ваш улюблений колір?");
-let isWorking = confirm("Ви зараз працюєте?");
-
-let isAdult = userAge >= 18;
-
-console.log("Ім'я:", userName, "| Тип:", typeof userName);
-console.log("Вік:", userAge, "| Тип:", typeof userAge);
-console.log("Місто:", userCity, "| Тип:", typeof userCity);
-console.log("Колір:", userColor, "| Тип:", typeof userColor);
-console.log("Працює:", isWorking, "| Тип:", typeof isWorking);
-console.log("Повнолітній:", isAdult);
-
-// 7. Виведення результату
-const summary = `
-АНКЕТА КОРИСТУВАЧА:
-Ім'я: ${userName}
-Вік: ${userAge}
-Місто: ${userCity}
-Улюблений колір: ${userColor}
-Працює: ${isWorking ? "так" : "ні"}
-Повнолітній: ${isAdult ? "так" : "ні"}
-`;
-
-alert(summary);
-console.log(summary);
+    const data = await response.json();
+    const formattedData = {
+      name: data.name,
+      id: data.id,
+      height: data.height,
+      weight: data.weight,
+      types: data.types.map((t) => t.type.name),
+      abilities: data.abilities.map((a) => a.ability.name),
+    };
+    pokemonOutput.textContent = JSON.stringify(formattedData, null, 2);
+    console.log("Дані покемона:", formattedData);
+  } catch (error) {
+    console.error("Помилка завантаження покемона:", error);
+    pokemonOutput.textContent = `Помилка: ${error.message}`;
+  }
+});
